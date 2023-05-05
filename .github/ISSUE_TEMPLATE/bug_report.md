@@ -7,17 +7,13 @@ assignees: ''
 
 ---
 
-<!-- This issue tracker is only for technical issues related to Ferrite Core.
-
-Technical issues applicable to Ferrite Core should be reported at https://github.com/koh-gt/ferrite-core/issues
-
-General namecoin-specific questions and/or support requests are best directed to the Namecoin Forum at https://t.me/ferrite_core.
+<!-- This issue tracker is only for technical issues related to Bitcoin Core.
 
 General bitcoin questions and/or support requests are best directed to the Bitcoin StackExchange at https://bitcoin.stackexchange.com.
 
-For reporting security issues, please read instructions at https://www.namecoin.org/team/security/.
+For reporting security issues, please read instructions at https://bitcoincore.org/en/contact/.
 
-If the node is "stuck" during sync or giving "block checksum mismatch" errors, please ensure your hardware is stable by running memtest and observe CPU temperature with a load-test tool such as linpack before creating an issue! Also, check if you have internet connection. -->
+If the node is "stuck" during sync or giving "block checksum mismatch" errors, please ensure your hardware is stable by running memtest and observe CPU temperature with a load-test tool such as linpack before creating an issue! -->
 
 <!-- Describe the issue -->
 
@@ -35,7 +31,7 @@ If the node is "stuck" during sync or giving "block checksum mismatch" errors, p
 
 **System information**
 
-<!-- What version of Namecoin Core are you using, where did you get it (website, self-compiled, etc)? -->
+<!-- What version of Bitcoin Core are you using, where did you get it (website, self-compiled, etc)? -->
 
 <!-- What type of machine are you observing the error on (OS/CPU and disk type)? -->
 

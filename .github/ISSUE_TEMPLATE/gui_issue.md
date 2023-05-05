@@ -1,11 +1,11 @@
 ---
-name: An issue or feature request applicable to Ferrite Core
-about: Any report, issue or feature request applicable to Ferrite Core should be reported at https://github.com/koh-gt/ferrite-core/issues/
-title: Any report, issue or feature request applicable to Ferrite Core should be reported at https://github.com/koh-gt/ferrite-core/issues/
-labels: upstream bug
+name: An issue or feature request related to the GUI
+about: Any report, issue or feature request related to the GUI should be reported at https://github.com/bitcoin-core/gui/issues/
+title: Any report, issue or feature request related to the GUI should be reported at https://github.com/bitcoin-core/gui/issues/
+labels: GUI
 assignees: ''
 
 ---
 
-Any report, issue or feature request applicable to Ferrite Core should be reported at
-https://github.com/koh-gt/ferrite-core/issues/
+Any report, issue or feature request related to the GUI should be reported at
+https://github.com/bitcoin-core/gui/issues/

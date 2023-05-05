@@ -8,18 +8,18 @@ The options known to work for building Ferrite Core on Windows are:
 * On Linux, using the [Mingw-w64](https://mingw-w64.org/doku.php) cross compiler tool chain. Ubuntu Bionic 18.04 is required
 and is the platform used to build the Ferrite Core Windows release binaries.
 * On Windows, using [Windows
-Subsystem for Linux (WSL)](https://msdn.microsoft.com/commandline/wsl/about) and the Mingw-w64 cross compiler tool chain.
+Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/about) and the Mingw-w64 cross compiler tool chain.
+* On Windows, using a native compiler tool chain such as [Visual Studio](https://www.visualstudio.com). See [README.md](/build_msvc/README.md).
 
 Other options which may work, but which have not been extensively tested are (please contribute instructions):
 
-* On Windows, using a POSIX compatibility layer application such as [cygwin](http://www.cygwin.com/) or [msys2](http://www.msys2.org/).
-* On Windows, using a native compiler tool chain such as [Visual Studio](https://www.visualstudio.com).
+* On Windows, using a POSIX compatibility layer application such as [cygwin](https://www.cygwin.com/) or [msys2](https://www.msys2.org/).
 
 Installing Windows Subsystem for Linux
 ---------------------------------------
 
 With Windows 10, Microsoft has released a new feature named the [Windows
-Subsystem for Linux (WSL)](https://msdn.microsoft.com/commandline/wsl/about). This
+Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/about). This
 feature allows you to run a bash shell directly on Windows in an Ubuntu-based
 environment. Within this environment you can cross compile for Windows without
 the need for a separate Linux VM or server. Note that while WSL can be installed with
@@ -28,7 +28,7 @@ tested with Ubuntu.
 
 This feature is not supported in versions of Windows prior to Windows 10 or on
 Windows Server SKUs. In addition, it is available [only for 64-bit versions of
-Windows](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide).
+Windows](https://docs.microsoft.com/windows/wsl/install-win10).
 
 Full instructions to install WSL are available on the above link.
 To install WSL on Windows 10 with Fall Creators Update installed (version >= 16215.0) do the following:
@@ -62,14 +62,18 @@ First, install the general dependencies:
     sudo apt install build-essential libtool autotools-dev automake pkg-config bsdmainutils curl git
 
 A host toolchain (`build-essential`) is necessary because some dependency
-packages (such as `protobuf`) need to build host utilities that are used in the
-build process.
+packages need to build host utilities that are used in the build process.
 
 See [dependencies.md](dependencies.md) for a complete overview.
 
 If you want to build the windows installer with `make deploy` you need [NSIS](https://nsis.sourceforge.io/Main_Page):
 
     sudo apt install nsis
+
+Acquire the source in the usual way:
+
+    git clone https://github.com/koh-gt/ferrite-main.git
+    cd ferrite-main
 
 ## Building for 64-bit Windows
 
@@ -84,70 +88,47 @@ Ubuntu Bionic 18.04 <sup>[1](#footnote1)</sup>:
 Once the toolchain is installed the build steps are common:
 
 Note that for WSL the Ferrite Core source path MUST be somewhere in the default mount file system, for
-example /usr/src/ferrite, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail.
+example /usr/src/litecoin, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail.
 This means you cannot use a directory that is located directly on the host Windows file system to perform the build.
 
-Acquire the source in the usual way:
+Additional WSL Note: WSL support for [launching Win32 applications](https://docs.microsoft.com/en-us/archive/blogs/wsl/windows-and-ubuntu-interoperability#launching-win32-applications-from-within-wsl)
+results in `Autoconf` configure scripts being able to execute Windows Portable Executable files. This can cause
+unexpected behaviour during the build, such as Win32 error dialogs for missing libraries. The recommended approach
+is to temporarily disable WSL support for Win32 applications.
 
-    git clone https://github.com/ferrite-project/ferrite.git
+YOU NEED fmt v9.0           - 8.0 wont cut it, so if you are using Ubuntu <= Jammy Jellyfish
 
-Once the source code is ready the build steps are below:
+wget -c https://launchpad.net/ubuntu/+archive/primary/+files/libfmt9_9.1.0+ds1-2_amd64.deb
+wget -c https://launchpad.net/ubuntu/+archive/primary/+files/libfmt-dev_9.1.0+ds1-2_amd64.deb
 
-    sudo chmod +x -R ferrite-core-main
-    cd ferrite-core-main
+install fmt before fmt-dev
+
+sudo apt install ./libfmt9_9.1.0+ds1-2_amd64.deb
+sudo apt install ./libfmt-dev_9.1.0+ds1-2_amd64.deb
+
+Build using:
+
+    sudo chmod +x -R ferrite-main
+    cd ferrite-main
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
+    sudo bash -c "echo 0 > /proc/sys/fs/binfmt_misc/status" # Disable WSL (Windows Subsystem for Linux) support for Win32 applications.
     cd depends
     make HOST=x86_64-w64-mingw32 -j4
     cd ..
-    ./autogen.sh # not required when building from tarball
-    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-incompatible-bdb  (if you are using Berkeley DB other than v4.8)
+    ./autogen.sh
+    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-incompatible-bdb --with-miniupnpc --enable-upnp-default --with-natpmp
+    # sudo apt-get install libminiupnpc-dev
     make -j4
-    make deploy
-
-    common qt errors - numeric_limits is not a member of std
-    go to qbytearraymatcher.h 
-    /ferrite-core-main/depends/work/build/i686-w64-mingw32/qt/5.9.7-30b9272ce7f/qtbase/src/corelib/tools/qbytearraymatcher.h
-    #include <stddef.h>
-    #include <limits.h>
-    #include <stdexcept>
-    #include <limits>
-
-## Building for 32-bit Windows
-
-To build executables for Windows 32-bit, install the following dependencies:
-
-    sudo apt install g++-mingw-w64-i686 mingw-w64-i686-dev
-
-For Ubuntu Bionic 18.04 and Windows Subsystem for Linux <sup>[1](#footnote1)</sup>:
-
-    sudo update-alternatives --config i686-w64-mingw32-g++  # Set the default mingw32 g++ compiler option to posix.
-
-Note that for WSL the Ferrite Core source path MUST be somewhere in the default mount file system, for
-example /usr/src/ferrite, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail.
-This means you cannot use a directory that located directly on the host Windows file system to perform the build.
-
-Acquire the source in the usual way:
-
-    git clone https://github.com/koh-gt/ferrite-core
-
-Then build using:
-    sudo chmod +x -R ferrite-core-main
-    cd ferrite-core-main
-    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
-    cd depends
-    make HOST=i686-w64-mingw32 -j4
-    cd ..
-    ./autogen.sh # not required when building from tarball
-
-    # if autogen.sh does not work due to permissions
-    chmod +x autogen.sh   # add permission
-
-    CONFIG_SITE=$PWD/depends/i686-w64-mingw32/share/config.site ./configure --prefix=/ --with-incompatible-bdb                   (if you are using Berkeley DB other than v4.8)
-    make -j4
+    sudo bash -c "echo 1 > /proc/sys/fs/binfmt_misc/status" # Enable WSL (Windows Subsystem for Linux) support for Win32 applications.
     make deploy
     
+No more 32-bit builds available.
+    
+Common qt errors
     common qt errors - numeric_limits is not a member of std
-    go to qbytearraymatcher.h
+    
+    go to qbytearraymatcher.h 
+    /ferrite-core-main/depends/work/build/i686-w64-mingw32/qt/5.9.7-30b9272ce7f/qtbase/src/corelib/tools/qbytearraymatcher.h
     #include <stddef.h>
     #include <limits.h>
     #include <stdexcept>
@@ -178,5 +159,5 @@ Footnotes
 compiler options to allow a choice between either posix or win32 threads. The default option is win32 threads which is the more
 efficient since it will result in binary code that links directly with the Windows kernel32.lib. Unfortunately, the headers
 required to support win32 threads conflict with some of the classes in the C++11 standard library, in particular std::mutex.
-It's not possible to build the Ferrite Core code using the win32 version of the Mingw-w64 cross compilers (at least not without
-modifying headers in the Ferrite Core source code).
+It's not possible to build the Litecoin Core code using the win32 version of the Mingw-w64 cross compilers (at least not without
+modifying headers in the Litecoin Core source code).
