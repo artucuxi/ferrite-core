@@ -88,7 +88,7 @@ Ubuntu Bionic 18.04 <sup>[1](#footnote1)</sup>:
 Once the toolchain is installed the build steps are common:
 
 Note that for WSL the Ferrite Core source path MUST be somewhere in the default mount file system, for
-example /usr/src/litecoin, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail.
+example /usr/src/ferrite, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail.
 This means you cannot use a directory that is located directly on the host Windows file system to perform the build.
 
 Additional WSL Note: WSL support for [launching Win32 applications](https://docs.microsoft.com/en-us/archive/blogs/wsl/windows-and-ubuntu-interoperability#launching-win32-applications-from-within-wsl)
@@ -113,12 +113,12 @@ Build using:
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
     sudo bash -c "echo 0 > /proc/sys/fs/binfmt_misc/status" # Disable WSL (Windows Subsystem for Linux) support for Win32 applications.
     cd depends
-    make HOST=x86_64-w64-mingw32 -j4
+    make HOST=x86_64-w64-mingw32 -j$(nproc)
     cd ..
     ./autogen.sh
-    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-incompatible-bdb --with-miniupnpc --enable-upnp-default --with-natpmp
+    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-incompatible-bdb --with-miniupnpc --enable-upnp-default --with-natpmp --disable-tests
     # sudo apt-get install libminiupnpc-dev
-    make -j4
+    make -j$(nproc)
     sudo bash -c "echo 1 > /proc/sys/fs/binfmt_misc/status" # Enable WSL (Windows Subsystem for Linux) support for Win32 applications.
     make deploy
     
@@ -128,7 +128,7 @@ Common qt errors
     common qt errors - numeric_limits is not a member of std
     
     go to qbytearraymatcher.h 
-    /ferrite-core-main/depends/work/build/i686-w64-mingw32/qt/5.9.7-30b9272ce7f/qtbase/src/corelib/tools/qbytearraymatcher.h
+    /ferrite-core-main/depends/work/build/x86_64-w64-mingw32/qt/5.9.8-e9d8e4b8361/qtbase/src/corelib/tools/qbytearraymatcher.h
     #include <stddef.h>
     #include <limits.h>
     #include <stdexcept>
@@ -159,5 +159,5 @@ Footnotes
 compiler options to allow a choice between either posix or win32 threads. The default option is win32 threads which is the more
 efficient since it will result in binary code that links directly with the Windows kernel32.lib. Unfortunately, the headers
 required to support win32 threads conflict with some of the classes in the C++11 standard library, in particular std::mutex.
-It's not possible to build the Litecoin Core code using the win32 version of the Mingw-w64 cross compilers (at least not without
-modifying headers in the Litecoin Core source code).
+It's not possible to build the Ferrite Core code using the win32 version of the Mingw-w64 cross compilers (at least not without
+modifying headers in the Ferrite Core source code).

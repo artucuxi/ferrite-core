@@ -99,28 +99,36 @@ public:
 
         // Deployment of MWEB (LIP-0002, LIP-0003, and LIP-0004)
         consensus.vDeployments[Consensus::DEPLOYMENT_MWEB].bit = 4;
-        consensus.vDeployments[Consensus::DEPLOYMENT_MWEB].nStartHeight = 99000000; // never*
+        consensus.vDeployments[Consensus::DEPLOYMENT_MWEB].nStartHeight = 150000; // 150120
         // MWEB can be put up for consensus voting in later versions when mining infrastructure is ready and compatible.
         consensus.vDeployments[Consensus::DEPLOYMENT_MWEB].nTimeoutHeight = 99999999; // never*
         // MWEB will be automatically activated after block 99999999 for now.
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000009cec62dc44b76d");  
-        // A total of 44170 005713 303405 hashes (44.2 PH) of work as of block 100000.
-        
+	consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000088358036fda6c15"); 
+        // A total of 613430 746037 251093 hashes (613.4 PH) of work as of block 154000. MWEB Activation height 150120
+	
+	// consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000088358036fda6c15"); 
+        // A total of 613430 746037 251093 hashes (613.4 PH) of work as of block 154000. MWEB Activation height 150120
+	// consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000050c151ee81a40c9");  
+        // A total of 363688 892397 404361 hashes (363.7 PH) of work as of block 149000.
         // consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000009cec62dc44b76d");  
-        // A total of 44170 005713 303405 hashes (44.17 PH) of work as of block 100000.
+        // A total of  44170 005713 303405 hashes (44.17 PH) of work as of block 100000.
         // consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000025004406a93795");  
-        // A total of 10414 866307 823509 hashes (10.41 PH) of work as of block 60000.
+        // A total of  10414 866307 823509 hashes (10.41 PH) of work as of block 60000.
         // consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000003f1caaf8e7d1f");  
-        // A total of  1110 277761 170719 hashes (1.110 PH) of work as of block 30000.
+        // A total of   1110 277761 170719 hashes (1.110 PH) of work as of block 30000.
         // consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000aaf695561da1");  
-        // A total of   187 976044 125601 hashes (188.0 TH) of work as of block 10000.
+        // A total of    187 976044 125601 hashes (188.0 TH) of work as of block 10000.
         
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x022dc4410add84d46359013d45df952493c53343304296a9066fc3df03dc8297");  
-        // Block 100000
-        
+        consensus.defaultAssumeValid = uint256S("0xe4925099992f4ca3337c9f85deb52b88da80a6ea40127adf2bc6c2851d5d49b2");  
+        // Block 154000
+	    
+	// consensus.defaultAssumeValid = uint256S("0xe4925099992f4ca3337c9f85deb52b88da80a6ea40127adf2bc6c2851d5d49b2");  
+        // Block 154000    
+        // consensus.defaultAssumeValid = uint256S("0xef695bb26b2655308cba06c2dd9b303c833db933d0cd872104f3073e471da2b1");  
+        // Block 149000
         // consensus.defaultAssumeValid = uint256S("0x022dc4410add84d46359013d45df952493c53343304296a9066fc3df03dc8297");  
         // Block 100000
         // consensus.defaultAssumeValid = uint256S("0xf38b639a8db731e7dac96eaae8f9ab443eaf85039433197345a72e1961d7f286");  
@@ -140,7 +148,7 @@ public:
         pchMessageStart[2] = 0x10;
         pchMessageStart[3] = 0xd9;
         nDefaultPort = 9574;
-        nPruneAfterHeight = 100000;
+        nPruneAfterHeight = 500000;
         m_assumed_blockchain_size = 2;
         m_assumed_chain_state_size = 2;
 
@@ -151,17 +159,19 @@ public:
 
         // Seed servers to connect to other nodes.
         // Default configuration file contains nodes of popular ferritecoin mining pools.
+	vSeeds.emplace_back("118.189.201.104");
+	vSeeds.emplace_back("38.242.145.73");
+        vSeeds.emplace_back("78.220.84.58");
+	vSeeds.emplace_back("133.177.197.167");
         vSeeds.emplace_back("node1.ferritecoin.org");  // node1.ferritecoin.org
         vSeeds.emplace_back("node2.ferritecoin.org");  // node2.ferritecoin.org
         vSeeds.emplace_back("node3.ferritecoin.org");  // node3.ferritecoin.org
         vSeeds.emplace_back("node4.ferritecoin.org");  // node4.ferritecoin.org
-	    
-        // Pool seednodes
-        vSeeds.emplace_back("188.165.227.178");  // spools.online
-        vSeeds.emplace_back("207.244.243.35");   // luckydogpool.com      
-        vSeeds.emplace_back("144.91.107.170");   // coinxpool.com
-        vSeeds.emplace_back("155.138.247.235");  // miningmypool.com 
-        vSeeds.emplace_back("155.133.26.223");   // zeusminingpool.com
+        
+	
+	
+	// CryptoID Chainz explorer
+	vSeeds.emplace_back("46.105.34.58");  // https://btc.cryptoid.info/fec/
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,36);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);
@@ -194,13 +204,15 @@ public:
                 {    30000, uint256S("0x64ddec3dde1a4fd6c41d06aacfc27694cfc9c3094574ae83fe51ef4740956a95")},
                 {    60000, uint256S("0xf38b639a8db731e7dac96eaae8f9ab443eaf85039433197345a72e1961d7f286")},
                 {   100000, uint256S("0x022dc4410add84d46359013d45df952493c53343304296a9066fc3df03dc8297")},
+		{   149000, uint256S("0xef695bb26b2655308cba06c2dd9b303c833db933d0cd872104f3073e471da2b1")},
+		{   154000, uint256S("0xe4925099992f4ca3337c9f85deb52b88da80a6ea40127adf2bc6c2851d5d49b2")},
             }
         };
 
         chainTxData = ChainTxData{
-            /* nTime    */ 1677953251,
-            /* nTxCount */ 111405,
-            /* dTxRate  */ 0.01352083
+            /* nTime    */ 1701118087,
+            /* nTxCount */ 173084,
+            /* dTxRate  */ 0.00237163
         };
     }
 };
@@ -300,6 +312,9 @@ public:
 		{      100, uint256S("0x6e423dcbe5e9f98776f856cf54eafc00d65f42f4c4718cd6caaf9cd45711c129")},     
 		{      160, uint256S("0xbf82199c7f3985ebd673372a328e6a1cf409c46d18c505e0fc2536f6c51ac885")},     // MWEB compatible
 		{      250, uint256S("0xd710251db07b4b5ad58ff59edcda83642af83e757fdf791424cf9d85e977bd65")},
+		{     1000, uint256S("0xb17ea0a86515e347878e11ccbddc2f9b0769f13418681b6bc95f1384ec58b38f")},
+		{     6000, uint256S("0x0e753be814e8c5cb8801ad5a291a9e52c7e06eeb01a8cd3ab92dad1c5c67afe6")},
+		    
             }
         };
 
@@ -397,7 +412,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
-        bech32_hrp = "rltc";
+        bech32_hrp = "rfec";
         mweb_hrp = "tmweb";
     }
 

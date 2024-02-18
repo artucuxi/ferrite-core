@@ -110,7 +110,7 @@ static const char* DEFAULT_ASMAP_FILENAME="ip_asn.map";
 /**
  * The PID file facilities.
  */
-static const char* BITCOIN_PID_FILENAME = "bitcoind.pid";
+static const char* BITCOIN_PID_FILENAME = "ferrited.pid";
 
 static fs::path GetPidFile(const ArgsManager& args)
 {
@@ -600,15 +600,27 @@ std::string LicenseInfo()
 {
     const std::string URL_SOURCE_CODE = "<https://github.com/koh-gt/ferrite-core>";
     const std::string URL_WEBSITE = "<https://ferritecoin.org>";
-    const std::string URL_BLOCK_EXPLORER = "<http://explorer.ferritecoin.org>";
+    const std::string URL_FORUM = "<https://ferritecoin.org:52443>";
+    const std::string URL_BLOCK_EXPLORER = "<https://ferritecoin.org:53443>";
+    const std::string FEXT_URL_WEBSITE = "<https://github.com/koh-gt/ferritext/>";
+    const std::string FEXT_HELP_URL_WEBSITE = "<https://github.com/koh-gt/ferritext/wiki>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i").translated, 2022, COPYRIGHT_YEAR) + " ") +
+           strprintf(_("\nCopyright (C) %i-%i The Dash Core developers").translated, 2014, COPYRIGHT_YEAR) +
+           strprintf(_("\nCopyright (C) %i-%i The Dogecoin Core developers").translated, 2013, COPYRIGHT_YEAR) +
            strprintf(_("\nCopyright (C) %i-%i The Litecoin Core developers").translated, 2011, COPYRIGHT_YEAR) +
            strprintf(_("\nCopyright (C) %i-%i The Bitcoin Core developers").translated, 2009, COPYRIGHT_YEAR) +
-           
+
            strprintf(_(" \n\nPlease contribute if you find %s useful. "
                        "Visit %s for further information about the software.").translated,
                PACKAGE_NAME, URL_WEBSITE) +
+
+           strprintf(_(" \n\nFerritext (FEXT) is a native messaging tool built on %s. FEXT is available from %s. "
+                       "Visit %s for further information about the feature.").translated,
+               PACKAGE_NAME, FEXT_URL_WEBSITE, FEXT_HELP_URL_WEBSITE) +
+        
+           strprintf(_("\nVisit Ferrite Forum at %s for more details.").translated,
+               URL_FORUM) +
 
            strprintf(_("\nThe source code is available from %s.").translated,
                URL_SOURCE_CODE) +
@@ -616,7 +628,6 @@ std::string LicenseInfo()
            strprintf(_("\nThe block explorer is available from %s.").translated,
                URL_BLOCK_EXPLORER) +
 
-           
            _("\n\nThis is experimental software.").translated +
            strprintf(_("\nDistributed under the MIT software license, see the accompanying file %s or %s").translated, "COPYING", "<https://opensource.org/licenses/MIT>") +
            strprintf(_("\n\nThis product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.").translated, "<https://opensource.org/licenses/MIT>");
@@ -1344,10 +1355,11 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
         if (configFile != NULL) {
             std::string strHeader = "# Ferrite Core configuration file:\n"
                                     "\n"            
-                                    "# Node settings (default: Full Node):\n"
+                                    "# Node settings (default: Full Node with no pruning):\n"
+                                    "prune=0\n"
                                     "daemon=1\n"
                                     "server=1\n"
-                                    "prune=0\n"
+                                    "blockfilterindex=basic\n"
                                     "txindex=1\n"
                                     "listen=1\n"
                                     "upnp=1\n"
@@ -1355,14 +1367,14 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                                     "# RPC settings (default: Local network only)\n"
                                     "rpcuser=user\n"
                                     "rpcpassword=password\n"
-                                    "port=9574\n"
                                     "rpcallowip=127.0.0.1\n"
                                     "rpcthreads=32\n"
                                     "\n"
                                     "# Relay and fee settings (default: 1 atom/vB)\n"
                                     "mintxfee=0.00001\n"
+                                    "maxtxfee=1000\n"
+                                    "maxfeerate=1000\n"
                                     "minrelaytxfee=0.00001\n"
-                                    "rpcconnect=500\n"
                                     "maxconnections=500\n"
                                     "\n"
                                     "# Depreciated RPCs for compatibility\n"
@@ -1371,20 +1383,14 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                                     "\n"
                                     "# Nodes:\n"
                                     "addnode=node1.ferritecoin.org\n"
-                                    "addnode=38.242.145.73:21004 # xeggex.com \n"
                                     "addnode=node2.ferritecoin.org\n"
-                                    "addnode=node3.ferritecoin.org\n"
-                                    "addnode=node2.walletbuilders.com\n"    
+                                    "addnode=node3.ferritecoin.org\n"  
+	                                "addnode=133.177.197.167:9574\n"
+                                    "addnode=38.242.145.73:21004 # xeggex.com \n"
                                     "addnode=118.189.201.104:9574\n"
                                     "addnode=118.189.201.104:9588\n"
                                     "addnode=118.189.201.104:9598\n"
                                     "addnode=78.220.84.58:9574\n"
-                                    "addnode=188.165.227.178:9574 # spools.online \n"
-                                    "addnode=207.244.243.35:9574 # luckydogpool.com \n"
-                                    "addnode=144.91.107.170:9574 # coinxpool.com \n"
-                                    "addnode=83.61.85.197:9574 # 2miningpool.com \n"
-                                    "addnode=155.138.247.235:9574 # miningmypool.com \n"
-                                    "addnode=155.133.26.223:9574 # zeusminingpool.com \n"
                                     "\n"
                                     "\n"
                                     "# Testnet parameters: \n"
@@ -1421,9 +1427,9 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
     // Warn about relative -datadir path.
     if (args.IsArgSet("-datadir") && !fs::path(args.GetArg("-datadir", "")).is_absolute()) {
         LogPrintf("Warning: relative datadir option '%s' specified, which will be interpreted relative to the " /* Continued */
-                  "current working directory '%s'. This is fragile, because if litecoin is started in the future "
+                  "current working directory '%s'. This is fragile, because if ferrite is started in the future "
                   "from a different location, it will be unable to locate the current data files. There could "
-                  "also be data loss if litecoin is started while in a temporary directory.\n",
+                  "also be data loss if ferrite is started while in a temporary directory.\n",
                   args.GetArg("-datadir", ""), fs::current_path().string());
     }
 
